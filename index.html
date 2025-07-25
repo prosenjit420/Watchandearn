@@ -627,6 +627,9 @@
             <div class="page active" id="home-page">
                 <div class="user-info">
                     <h3 id="username">Hello, User</h3>
+                    <div class="balance-info">
+                        <span>Balance: $<span id="user-balance">0.00</span></span>
+                    </div>
                     <p>Member since: <span id="join-date">Today</span></p>
                 </div>
 
@@ -1129,7 +1132,7 @@
                 // Update referral link display
                 if (referralLinkText && userData.referralData) {
                     const refLink = userData.referralData.referralLink || 
-                        `https://t.me/watchadsandearnbot?start=ref_${userData.referralData.referralCode}`;
+                        `https://t.me/${botConfig.username}?${botConfig.startCommand}=ref_${userData.referralData.referralCode}`;
                     referralLinkText.textContent = refLink;
                     userData.referralData.referralLink = refLink; // Ensure it's saved
                 }
