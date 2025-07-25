@@ -836,19 +836,17 @@
             async function showInterstitialAd() {
                 try {
                     await show_9609937();
-                    const confirmed = await showConfirmationDialog(0.15);
-                    if (confirmed) {
-                        // Update user data
-                        userData.adsWatched += 1;
-                        userData.balance += 0.15;
-                        userData.totalEarned += 0.15;
-                        userData.todayEarned += 0.15;
-                        
-                        // Save and update UI
-                        saveUserData();
-                        updateUI();
-                        showAlert('$0.15 has been added to your balance!');
-                    }
+                    // Generate random reward between $0.01 and $0.05 (inclusive)
+                    const minCents = 1, maxCents = 5;
+                    const randomCents = Math.floor(Math.random() * (maxCents - minCents + 1)) + minCents;
+                    const reward = randomCents / 100;
+                    userData.adsWatched += 1;
+                    userData.balance += reward;
+                    userData.totalEarned += reward;
+                    userData.todayEarned += reward;
+                    saveUserData();
+                    updateUI();
+                    showAlert(`$${reward.toFixed(2)} has been added to your balance!`);
                 } catch (error) {
                     console.error('Error showing interstitial ad:', error);
                     showAlert('Failed to show ad. Please try again.');
@@ -858,19 +856,17 @@
             async function showPopupAd() {
                 try {
                     await show_9609937('pop');
-                    const confirmed = await showConfirmationDialog(0.10);
-                    if (confirmed) {
-                        // Update user data
-                        userData.adsWatched += 1;
-                        userData.balance += 0.10;
-                        userData.totalEarned += 0.10;
-                        userData.todayEarned += 0.10;
-                        
-                        // Save and update UI
-                        saveUserData();
-                        updateUI();
-                        showAlert('$0.10 has been added to your balance!');
-                    }
+                    // Generate random reward between $0.01 and $0.05 (inclusive)
+                    const minCents = 1, maxCents = 5;
+                    const randomCents = Math.floor(Math.random() * (maxCents - minCents + 1)) + minCents;
+                    const reward = randomCents / 100;
+                    userData.adsWatched += 1;
+                    userData.balance += reward;
+                    userData.totalEarned += reward;
+                    userData.todayEarned += reward;
+                    saveUserData();
+                    updateUI();
+                    showAlert(`$${reward.toFixed(2)} has been added to your balance!`);
                 } catch (error) {
                     console.error('Error showing popup ad:', error);
                     showAlert('Failed to show ad. Please try again.');
