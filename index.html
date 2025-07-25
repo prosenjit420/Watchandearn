@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdWatch - Earn Money</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src='//libtl.com/sdk.js' data-zone='9609937' data-sdk='show_9609937'></script>
+    <style>
+        :root {
+            --primary-color: #0088cc;
+            --secondary-color: #f0f0f0;
+            --accent-color: #ff9500;
+            --text-color: #333;
+            --light-text: #fff;
+            --card-bg: #fff;
+            --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            --referral-color: #6f42c1;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 100%;
+        }
+
+        .app-header {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .app-header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            padding-bottom: 80px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .page-header h2 {
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .page-header p {
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .balance-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .balance {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .balance-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ad-container {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .ad-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .ad-description {
+            margin-bottom: 15px;
+            color: var(--text-color);
+        }
+
+        .ad-reward {
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: #006699;
+            transform: translateY(-2px);
+        }
+
+        .btn-accent {
+            background-color: var(--accent-color);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-accent:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .reward-notification {
+            animation: slideIn 0.5s ease-out;
+            position: relative;
+            z-index: 1000;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 0 15px;
+        }
+        
+        .reward-notification > div {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .reward-notification > div:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+        }
+
+        /* Confirmation Dialog Styles */
+        .confirmation-dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .dialog-content {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            max-width: 300px;
+            width: 90%;
+        }
+
+        .dialog-content h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .dialog-content p {
+            color: var(--text-color);
+            margin-bottom: 20px;
+        }
+
+        .dialog-content .btn {
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .claimed-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .btn-accent:hover {
+            background-color: #e68a00;
+        }
+
+        .btn-referral {
+            background-color: var(--referral-color);
+        }
+
+        .btn-referral:hover {
+            background-color: #5a32a3;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .ads-section {
+            margin-top: 20px;
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .ad-types {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .ad-type {
+            background-color: var(--card-bg);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            justify-content: space-between;
+        }
+
+        .ad-type-icon {
+            font-size: 2rem;
+            color: var(--accent-color);
+        }
+
+        .ad-type-info h4 {
+            margin: 0 0 5px 0;
+            color: var(--text-color);
+        }
+
+        .ad-type-info p {
+            margin: 0;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+
+        .stat-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-color);
+        }
+
+        .withdraw-section {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .withdraw-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            text-align: center;
+        }
+
+        .withdraw-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .withdraw-option {
+            background-color: var(--secondary-color);
+            border-radius: 5px;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            min-width: 100px;
+        }
+
+        .withdraw-option:hover {
+            background-color: #e0e0e0;
+        }
+
+        .withdraw-option.active {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+        }
+
+        .ad-space {
+            width: 100%;
+            min-height: 100px;
+            background-color: #f5f5f5;
+            border: 1px dashed #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 15px;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .ad-video-container {
+            width: 100%;
+            margin: 15px 0;
+        }
+
+        .progress-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background-color: var(--accent-color);
+            border-radius: 5px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--card-bg);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            min-width: 60px;
+        }
+
+        .nav-item.active {
+            color: var(--primary-color);
+            background-color: rgba(0, 136, 204, 0.1);
+        }
+
+        .nav-icon {
+            font-size: 1.2rem;
+            margin-bottom: 2px;
+        }
+
+        .nav-item span {
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        /* Withdraw Form */
+        .withdraw-form {
+            margin-top: 20px;
+        }
+
+        .withdraw-form input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        .withdraw-form button {
+            width: 100%;
+        }
+
+        /* Withdrawal History */
+        .withdrawal-history {
+            margin-top: 30px;
+        }
+
+        .withdrawal-history h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .history-item {
+            background-color: var(--card-bg);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        /* Referral Section */
+        .referral-container {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            display: none; /* Hide the referral container on home page */
+        }
+
+        .referral-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--referral-color);
+        }
+
+        .referral-description {
+            margin-bottom: 15px;
+            color: var(--text-color);
+        }
+
+        .referral-reward {
+            font-weight: bold;
+            color: var(--referral-color);
+            margin-bottom: 15px;
+        }
+
+        .referral-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .referral-stat-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .referral-stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--referral-color);
+        }
+
+        .referral-stat-label {
+            font-size: 0.9rem;
+            color: var(--text-color);
+        }
+
+        .referral-link-container {
+            background-color: rgba(111, 66, 193, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            word-break: break-all;
+        }
+
+        .referral-link {
+            font-weight: bold;
+            color: var(--referral-color);
+        }
+
+        .copy-btn {
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .referral-history {
+            margin-top: 20px;
+        }
+
+        .referral-history h3 {
+            color: var(--referral-color);
+            margin-bottom: 15px;
+        }
+
+        /* Responsive adjustments */
+        @media (min-width: 768px) {
+            .main-content {
+                max-width: 750px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+
+            .stats, .referral-stats {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .bottom-nav {
+                max-width: 750px;
+                left: 50%;
+                transform: translateX(-50%);
+                border-radius: 15px 15px 0 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Home Page -->
+            <div class="page active" id="home-page">
+                <div class="user-info">
+                    <h3 id="username">Hello, User</h3>
+                    <p>Member since: <span id="join-date">Today</span></p>
+                </div>
+
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="ads-watched">0</div>
+                        <div class="stat-label">Ads Watched</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-earned">$0.00</div>
+                        <div class="stat-label">Total Earned</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="today-earned">$0.00</div>
+                        <div class="stat-label">Today Earned</div>
+                    </div>
+                </div>
+
+                <div class="ads-section">
+                    <h3 class="section-title">Available Ads</h3>
+                    <div class="ad-types">
+                        <div class="ad-type">
+                            <div class="ad-type-icon">🎬</div>
+                            <div class="ad-type-info">
+                                <h4>Rewarded Interstitial</h4>
+                            </div>
+                            <button class="btn btn-accent" id="interstitial-btn">Watch Ad</button>
+                        </div>
+                        <div class="ad-type">
+                            <div class="ad-type-icon">🎯</div>
+                            <div class="ad-type-info">
+                                <h4>Rewarded Popup</h4>
+                            </div>
+                            <button class="btn btn-accent" id="popup-btn">Watch Ad</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Withdraw Page -->
+            <div class="page" id="withdraw-page">
+                <div class="page-header">
+                    <h2>Withdraw Earnings</h2>
+                    <p>Minimum withdrawal: $5.00</p>
+                </div>
+
+                <div class="withdraw-section">
+                    <div class="withdraw-options">
+                        <div class="withdraw-option active" data-method="bank">Bank Transfer</div>
+                        <div class="withdraw-option" data-method="paypal">PayPal</div>
+                        <div class="withdraw-option" data-method="crypto">Crypto</div>
+                    </div>
+                    
+                    <div class="withdraw-form">
+                        <div id="withdraw-error" style="color: red; margin-bottom: 10px; display: none;"></div>
+                        <input type="number" id="withdraw-amount" placeholder="Enter amount" min="5" step="0.01">
+                        <input type="text" id="withdraw-details" placeholder="Payment details">
+                        <button class="btn" id="withdraw-btn">Request Withdrawal</button>
+                    </div>
+                </div>
+
+                <div class="withdrawal-history">
+                    <h3>Recent Withdrawals</h3>
+                    <div class="history-item">
+                        <span>No withdrawals yet</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Referrals Page -->
+            <div class="page" id="referrals-page">
+                <div class="page-header">
+                    <h2 style="color: var(--referral-color);">Your Referrals</h2>
+                    <p>Earn 20% of your friends' earnings</p>
+                </div>
+
+                <div class="referral-stats">
+                    <div class="referral-stat-card">
+                        <div class="referral-stat-value" id="total-referrals">0</div>
+                        <div class="referral-stat-label">Total Referrals</div>
+                    </div>
+                    <div class="referral-stat-card">
+                        <div class="referral-stat-value" id="active-referrals">0</div>
+                        <div class="referral-stat-label">Active Referrals</div>
+                    </div>
+                    <div class="referral-stat-card">
+                        <div class="referral-stat-value" id="referral-earnings">$0.00</div>
+                        <div class="referral-stat-label">Total Earned</div>
+                    </div>
+                </div>
+
+                <div class="referral-container" style="display: block;">
+                    <h3 class="referral-title">Your Referral Link</h3>
+                    <p class="referral-description">Share this link with friends and earn when they join and watch ads</p>
+                    <div class="referral-link-container">
+                        <span class="referral-link" id="referral-link-text">Loading...</span>
+                    </div>
+                    <button class="btn btn-referral copy-btn" id="copy-referral-btn">Copy Link</button>
+                    <button class="btn btn-accent copy-btn" id="share-referral-btn">Share via Telegram</button>
+                </div>
+
+                <div class="referral-history">
+                    <h3>Recent Referrals</h3>
+                    <div class="history-item">
+                        <span>No referrals yet</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <div class="nav-item active" data-page="home">
+                <div class="nav-icon">🏠</div>
+                <span>Home</span>
+            </div>
+            <div class="nav-item" data-page="referrals">
+                <div class="nav-icon">👥</div>
+                <span>Referrals</span>
+            </div>
+            <div class="nav-item" data-page="withdraw">
+                <div class="nav-icon">💰</div>
+                <span>Withdraw</span>
+            </div>
+        </nav>
+    </div>
+
+    <script>
+        // Wait for the DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Telegram Web App
+            const tg = window.Telegram?.WebApp || {
+                expand: () => {},
+                showAlert: (msg) => alert(msg),
+                isVersionAtLeast: () => false,
+                share: () => {},
+                openTelegramLink: (url) => window.open(url, '_blank')
+            };
+            
+            // Function to handle new user signup with referral
+            function checkForReferral() {
+                try {
+                    // Check URL parameters for referral code
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const refCode = urlParams.get('ref');
+                    
+                    // If this is a new user and has a referral code
+                    if (refCode && (!localStorage.getItem('adWatchUserData') || 
+                        JSON.parse(localStorage.getItem('adWatchUserData')).adsWatched === 0)) {
+                        
+                        // Store the referrer's code
+                        userData.referredBy = refCode;
+                        
+                        // Show welcome message
+                        tg.showAlert(`Welcome! You've been referred by a friend.`);
+                        
+                        // Save the updated user data
+                        saveUserData();
+                    }
+                } catch (e) {
+                    console.error('Error checking referral:', e);
+                }
+            }
+            
+            // Bot configuration
+            const botConfig = {
+                username: 'RewarnzoBot',
+                startCommand: 'start'
+            };
+
+
+
+            // Ad functions
+            // Confirmation dialog function
+            function showConfirmationDialog(amount) {
+                return new Promise((resolve) => {
+                    const dialog = document.createElement('div');
+                    dialog.className = 'confirmation-dialog';
+                    dialog.innerHTML = `
+                        <div class="dialog-content">
+                            <h3>Confirm Reward</h3>
+                            <p>You have earned $${amount.toFixed(2)}!</p>
+                            <p>Press OK to add this amount to your balance.</p>
+                            <button class="btn btn-accent" id="confirm-ok">OK</button>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(dialog);
+                    
+                    const okButton = dialog.querySelector('#confirm-ok');
+                    okButton.addEventListener('click', () => {
+                        dialog.remove();
+                        resolve(true);
+                    });
+                    
+                    // Close dialog when clicking outside
+                    dialog.addEventListener('click', (e) => {
+                        if (e.target === dialog) {
+                            dialog.remove();
+                            resolve(false);
+                        }
+                    });
+                });
+            }
+
+            async function showInterstitialAd() {
+                try {
+                    await show_9609937();
+                    const confirmed = await showConfirmationDialog(0.15);
+                    if (confirmed) {
+                        // Update user data
+                        userData.adsWatched += 1;
+                        userData.balance += 0.15;
+                        userData.totalEarned += 0.15;
+                        userData.todayEarned += 0.15;
+                        
+                        // Save and update UI
+                        saveUserData();
+                        updateUI();
+                        showAlert('$0.15 has been added to your balance!');
+                    }
+                } catch (error) {
+                    console.error('Error showing interstitial ad:', error);
+                    showAlert('Failed to show ad. Please try again.');
+                }
+            }
+
+            async function showPopupAd() {
+                try {
+                    await show_9609937('pop');
+                    const confirmed = await showConfirmationDialog(0.10);
+                    if (confirmed) {
+                        // Update user data
+                        userData.adsWatched += 1;
+                        userData.balance += 0.10;
+                        userData.totalEarned += 0.10;
+                        userData.todayEarned += 0.10;
+                        
+                        // Save and update UI
+                        saveUserData();
+                        updateUI();
+                        showAlert('$0.10 has been added to your balance!');
+                    }
+                } catch (error) {
+                    console.error('Error showing popup ad:', error);
+                    showAlert('Failed to show ad. Please try again.');
+                }
+            }
+
+            // Add event listeners for ad buttons
+            document.getElementById('interstitial-btn').addEventListener('click', showInterstitialAd);
+            document.getElementById('popup-btn').addEventListener('click', showPopupAd);
+            
+            // Generate a unique user ID if not exists
+            const userId = 'user_' + Math.random().toString(36).substr(2, 9);
+            
+            // Initialize user data with default values if not exists
+            let userData = {
+                balance: 0,
+                adsWatched: 0,
+                totalEarned: 0,
+                todayEarned: 0,
+                joinDate: new Date().toLocaleDateString(),
+                referralData: {
+                    referralCode: generateReferralCode(),
+                    referralLink: '',
+                    totalReferrals: 0,
+                    activeReferrals: 0,
+                    referralEarnings: 0
+                },
+                lastAdWatch: 0,
+                // Add today's date to check for daily reset
+                lastActivityDate: new Date().toDateString()
+            };
+            
+            // Load existing user data or initialize with defaults
+            const savedData = localStorage.getItem('adWatchUserData');
+            if (savedData) {
+                const parsedData = JSON.parse(savedData);
+                // Check if it's a new day to reset today's earnings
+                const today = new Date().toDateString();
+                if (parsedData.lastActivityDate !== today) {
+                    parsedData.todayEarned = 0;
+                    parsedData.lastActivityDate = today;
+                }
+                userData = { ...userData, ...parsedData };
+            }
+            
+            // Ad rewards (random between 1-5 cents)
+            const adRewards = [0.01, 0.02, 0.03, 0.04, 0.05];
+            
+            // Current ad watching state
+            let adWatchInterval;
+            let currentAdTime = 30; // 30 seconds
+            let currentAdReward = 0.03; // Default reward
+            
+            // Initialize the app
+            function initApp() {
+                // Expand the app to full view
+                tg.expand();
+                
+                // Set up user data from Telegram
+                if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                    const user = tg.initDataUnsafe.user;
+                    const usernameElement = document.getElementById('username');
+                    if (usernameElement) {
+                        usernameElement.textContent = `Hello, ${user.first_name || 'User'}`;
+                    }
+                    
+                    // Generate referral code if not exists
+                    if (!userData.referralData.referralCode) {
+                        userData.referralData.referralCode = generateReferralCode();
+                    }
+                    
+                    // Set referral link with the bot username
+                    userData.referralData.referralLink = `https://t.me/${botConfig.username}?${botConfig.startCommand}=ref_${userData.referralData.referralCode}`;
+                    
+                    const referralLinkElement = document.getElementById('referral-link-text');
+                    if (referralLinkElement) referralLinkElement.textContent = userData.referralData.referralLink;
+                }
+                
+                // Check for referral parameter in start parameter
+                if (tg.initDataUnsafe && tg.initDataUnsafe.start_param) {
+                    const referralCode = tg.initDataUnsafe.start_param;
+                    console.log('Referred by code:', referralCode);
+                }
+                
+                // Load user data from localStorage
+                loadUserData();
+                
+                // Set up navigation
+                setupNavigation();
+                
+                // Set up event listeners once using event delegation
+                document.body.addEventListener('click', function(event) {
+                    // Handle watch ad button
+                    if (event.target.closest('#watch-ad-btn') || event.target.id === 'watch-ad-btn') {
+                        event.preventDefault();
+                        startAdWatch();
+                        return;
+                    }
+                    
+                    // Handle claim reward button
+                    if ((event.target.closest('#claim-reward-btn') || event.target.id === 'claim-reward-btn') && 
+                        !event.target.disabled) {
+                        event.preventDefault();
+                        const claimBtn = document.getElementById('claim-reward-btn');
+                        if (claimBtn) {
+                            claimBtn.disabled = true;
+                            claimAdReward();
+                        }
+                        return;
+                    }
+                    
+                    // Handle withdraw button
+                    if (event.target.closest('#withdraw-btn') || event.target.id === 'withdraw-btn') {
+                        event.preventDefault();
+                        requestWithdrawal();
+                        return;
+                    }
+                    
+                    // Handle copy referral buttons
+                    if (event.target.closest('#copy-referral-btn') || 
+                        event.target.id === 'copy-referral-btn') {
+                        event.preventDefault();
+                        copyReferralLink();
+                        return;
+                    }
+                    
+                    // Handle share referral buttons
+                    if (event.target.closest('#share-referral-btn') || 
+                        event.target.id === 'share-referral-btn') {
+                        event.preventDefault();
+                        shareReferralLink();
+                        return;
+                    }
+                    
+                    // Handle close success modal
+                    if (event.target.closest('#close-success-modal') || event.target.id === 'close-success-modal') {
+                        event.preventDefault();
+                        const successModal = document.getElementById('success-modal');
+                        if (successModal) successModal.style.display = 'none';
+                        return;
+                    }
+                });
+                
+                // Close modal when clicking X
+                document.querySelectorAll('.close-modal').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const modal = this.closest('.modal');
+                        if (modal) {
+                            modal.style.display = 'none';
+                            // Reset ad watching if modal closed prematurely
+                            if (modal.id === 'ad-modal') {
+                                resetAdWatch();
+                            }
+                        }
+                    });
+                });
+                
+                // Withdraw method selection
+                document.querySelectorAll('.withdraw-option').forEach(option => {
+                    option.addEventListener('click', function() {
+                        document.querySelectorAll('.withdraw-option').forEach(opt => {
+                            opt.classList.remove('active');
+                        });
+                        this.classList.add('active');
+                        updateWithdrawDetailsPlaceholder(this.dataset.method);
+                    });
+                });
+            }
+
+            // Initialize the app when DOM is loaded
+            initApp();
+            
+            // Check for referral code in URL
+            checkForReferral();
+            
+            // Initialize referral link
+            if (userData.referralData && !userData.referralData.referralLink) {
+                userData.referralData.referralLink = `https://t.me/watchadsandearnbot?start=${userData.referralData.referralCode}`;
+                saveUserData();
+            }
+            
+            // Generate a random referral code
+            function generateReferralCode() {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                let result = '';
+                for (let i = 0; i < 8; i++) {
+                    result += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return result;
+            }
+            
+            // Setup navigation
+            function setupNavigation() {
+                const navItems = document.querySelectorAll('.nav-item');
+                const pages = document.querySelectorAll('.page');
+                
+                navItems.forEach(item => {
+                    item.addEventListener('click', function() {
+                        const targetPage = this.dataset.page;
+                        
+                        // Remove active class from all nav items and pages
+                        navItems.forEach(nav => nav.classList.remove('active'));
+                        pages.forEach(page => page.classList.remove('active'));
+                        
+                        // Add active class to clicked nav item and corresponding page
+                        this.classList.add('active');
+                        const targetPageElement = document.getElementById(targetPage + '-page');
+                        if (targetPageElement) targetPageElement.classList.add('active');
+                    });
+                });
+            }
+            
+            // Load user data from localStorage
+            function loadUserData() {
+                try {
+                    const savedData = localStorage.getItem('adWatchUserData');
+                    if (savedData) {
+                        userData = JSON.parse(savedData);
+                    }
+                    updateUI();
+                } catch (e) {
+                    console.error('Error loading user data:', e);
+                }
+            }
+            
+            // Save user data to localStorage
+            function saveUserData() {
+                try {
+                    localStorage.setItem('adWatchUserData', JSON.stringify(userData));
+                } catch (e) {
+                    console.error('Error saving user data:', e);
+                }
+            }
+            
+            // Update the UI with current user data
+            function updateUI() {
+                const balanceElement = document.getElementById('user-balance');
+                const adsWatchedElement = document.getElementById('ads-watched');
+                const totalEarnedElement = document.getElementById('total-earned');
+                const todayEarnedElement = document.getElementById('today-earned');
+                const joinDateElement = document.getElementById('join-date');
+                const totalReferralsElement = document.getElementById('total-referrals');
+                const activeReferralsElement = document.getElementById('active-referrals');
+                const referralEarningsElement = document.getElementById('referral-earnings');
+                const referralLinkText = document.getElementById('referral-link-text');
+                
+                if (balanceElement) balanceElement.textContent = userData.balance.toFixed(2);
+                if (adsWatchedElement) adsWatchedElement.textContent = userData.adsWatched;
+                if (totalEarnedElement) totalEarnedElement.textContent = '$' + userData.totalEarned.toFixed(2);
+                if (todayEarnedElement) todayEarnedElement.textContent = '$' + userData.todayEarned.toFixed(2);
+                if (joinDateElement) joinDateElement.textContent = userData.joinDate;
+                if (totalReferralsElement) totalReferralsElement.textContent = userData.referralData.totalReferrals;
+                if (activeReferralsElement) activeReferralsElement.textContent = userData.referralData.activeReferrals;
+                if (referralEarningsElement) referralEarningsElement.textContent = '$' + userData.referralData.referralEarnings.toFixed(2);
+                
+                // Update referral link display
+                if (referralLinkText && userData.referralData) {
+                    const refLink = userData.referralData.referralLink || 
+                        `https://t.me/watchadsandearnbot?start=ref_${userData.referralData.referralCode}`;
+                    referralLinkText.textContent = refLink;
+                    userData.referralData.referralLink = refLink; // Ensure it's saved
+                }
+            }
+            
+            // Start watching an ad
+            function startAdWatch() {
+                // Check if this ad has already been claimed
+                const adId = 'ad_' + Math.floor(Date.now() / 1000); // Unique ID for this ad
+                const claimedAds = JSON.parse(localStorage.getItem('claimedAds') || '{}');
+                
+                if (claimedAds[adId]) {
+                    tg.showAlert('You\'ve already claimed this reward!');
+                    return;
+                }
+                
+                // Random reward for this ad (between $0.05 and $0.25)
+                currentAdReward = (Math.floor(Math.random() * 21) + 5) / 100; // 0.05 to 0.25
+                const adRewardElement = document.getElementById('ad-reward-amount');
+                if (adRewardElement) adRewardElement.textContent = '$' + currentAdReward.toFixed(2);
+                
+                // Store the current ad ID in the data attribute
+                const claimBtn = document.getElementById('claim-reward-btn');
+                if (claimBtn) claimBtn.dataset.adId = adId;
+                
+                // Reset timer (30 seconds)
+                currentAdTime = 30;
+                const timeRemainingElement = document.getElementById('time-remaining');
+                const adProgressElement = document.getElementById('ad-progress');
+                const claimRewardBtn = document.getElementById('claim-reward-btn');
+                const adModal = document.getElementById('ad-modal');
+                
+                if (timeRemainingElement) timeRemainingElement.textContent = currentAdTime;
+                if (adProgressElement) adProgressElement.style.width = '0%';
+                if (claimRewardBtn) {
+                    claimRewardBtn.disabled = true;
+                    claimRewardBtn.textContent = 'Watch Ad to Unlock';
+                    claimRewardBtn.style.backgroundColor = '#cccccc';
+                }
+                
+                // Show the modal
+                if (adModal) adModal.style.display = 'flex';
+                
+                // Start the countdown
+                adWatchInterval = setInterval(function() {
+                    currentAdTime--;
+                    const countdownElement = document.getElementById('ad-countdown');
+                    if (countdownElement) countdownElement.textContent = currentAdTime;
+                    if (timeRemainingElement) timeRemainingElement.textContent = currentAdTime;
+                    
+                    // Update progress bar
+                    const progress = ((30 - currentAdTime) / 30) * 100;
+                    if (adProgressElement) adProgressElement.style.width = progress + '%';
+                    
+                    if (currentAdTime <= 0) {
+                        // Ad completed
+                        clearInterval(adWatchInterval);
+                        if (claimRewardBtn) {
+                            claimRewardBtn.disabled = false;
+                            claimRewardBtn.textContent = 'Claim $' + currentAdReward.toFixed(2);
+                            claimRewardBtn.style.backgroundColor = ''; // Reset to default color
+                        }
+                    }
+                }, 1000);
+            }
+            
+            // Claim reward after watching ad
+            function claimAdReward() {
+                const claimBtn = document.getElementById('claim-reward-btn');
+                const adId = claimBtn?.dataset.adId;
+                
+                if (!adId) {
+                    tg.showAlert('Error: Invalid ad session');
+                    return;
+                }
+                
+                // Mark this ad as claimed
+                const claimedAds = JSON.parse(localStorage.getItem('claimedAds') || '{}');
+                if (claimedAds[adId]) {
+                    tg.showAlert('You\'ve already claimed this reward!');
+                    return;
+                }
+                
+                try {
+                    // Add reward to balance
+                    const rewardAmount = currentAdReward;
+                    userData.balance += rewardAmount;
+                    userData.totalEarned += rewardAmount;
+                    userData.todayEarned += rewardAmount;
+                    userData.adsWatched++;
+                    
+                    // Mark this ad as claimed in localStorage
+                    claimedAds[adId] = {
+                        amount: rewardAmount,
+                        claimedAt: new Date().toISOString()
+                    };
+                    localStorage.setItem('claimedAds', JSON.stringify(claimedAds));
+                
+                    // Save and update UI
+                    saveUserData();
+                    updateUI();
+                    
+                    // Show success message
+                    const successMessage = `🎉 Success! You've earned $${rewardAmount.toFixed(2)}!`;
+                    tg.showAlert(successMessage);
+                    
+                    // Close the modal and navigate to home
+                    setTimeout(() => {
+                        const adModal = document.getElementById('ad-modal');
+                        if (adModal) adModal.style.display = 'none';
+                        resetAdWatch();
+                        
+                        // Navigate to home tab
+                        const navItems = document.querySelectorAll('.nav-item');
+                        const pages = document.querySelectorAll('.page');
+                        navItems.forEach(nav => nav.classList.remove('active'));
+                        pages.forEach(page => page.classList.remove('active'));
+                        
+                        const homeNav = document.querySelector('.nav-item[data-page="home"]');
+                        const homePage = document.getElementById('home-page');
+                        
+                        if (homeNav && homePage) {
+                            homeNav.classList.add('active');
+                            homePage.classList.add('active');
+                            
+                            // Scroll to top of home page
+                            homePage.scrollTo({ top: 0, behavior: 'smooth' });
+                        }
+                    }, 500);
+                } catch (error) {
+                    console.error('Error claiming reward:', error);
+                    tg.showAlert('Error claiming reward. Please try again.');
+                }
+            }
+            
+            // Reset ad watching state
+            function resetAdWatch() {
+                clearInterval(adWatchInterval);
+            }
+            
+            // Request withdrawal
+            function requestWithdrawal() {
+                const amountInput = document.getElementById('withdraw-amount');
+                const activeOption = document.querySelector('.withdraw-option.active');
+                const detailsInput = document.getElementById('withdraw-details');
+                const errorDiv = document.getElementById('withdraw-error');
+                if (errorDiv) errorDiv.style.display = 'none';
+                console.log('requestWithdrawal called');
+                if (!amountInput || !activeOption || !detailsInput) {
+                    if (errorDiv) { errorDiv.textContent = 'Withdrawal form is not properly loaded'; errorDiv.style.display = 'block'; }
+                    tg.showAlert('Withdrawal form is not properly loaded');
+                    return;
+                }
+                const amount = parseFloat(amountInput.value);
+                const method = activeOption.dataset.method;
+                const details = detailsInput.value.trim();
+                // Validate
+                if (isNaN(amount) || amount < 5) {
+                    if (errorDiv) { errorDiv.textContent = 'Minimum withdrawal amount is $5.00'; errorDiv.style.display = 'block'; }
+                    tg.showAlert('Minimum withdrawal amount is $5.00');
+                    return;
+                }
+                if (amount > userData.balance) {
+                    if (errorDiv) { errorDiv.textContent = 'Insufficient balance'; errorDiv.style.display = 'block'; }
+                    tg.showAlert('Insufficient balance');
+                    return;
+                }
+                if (!details) {
+                    if (errorDiv) { errorDiv.textContent = 'Please enter payment details'; errorDiv.style.display = 'block'; }
+                    tg.showAlert('Please enter payment details');
+                    return;
+                }
+                // Deduct from balance
+                userData.balance -= amount;
+                saveUserData();
+                updateUI();
+                // Clear form
+                amountInput.value = '';
+                detailsInput.value = '';
+                // Show success modal
+                const successModal = document.getElementById('success-modal');
+                if (successModal) successModal.style.display = 'flex';
+            }
+            
+            // Copy referral link to clipboard
+            function copyReferralLink() {
+                const referralLink = userData.referralData.referralLink || 
+                    `https://t.me/${botConfig.username}?${botConfig.startCommand}=ref_${userData.referralData.referralCode}`;
+                navigator.clipboard.writeText(referralLink).then(() => {
+                    tg.showAlert('Referral link copied to clipboard!');
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                    tg.showAlert('Failed to copy link. Please try again.');
+                });
+            }
+            
+            // Share referral link via Telegram
+            function shareReferralLink() {
+                const referralLink = userData.referralData.referralLink || 
+                    `https://t.me/${botConfig.username}?${botConfig.startCommand}=ref_${userData.referralData.referralCode}`;
+                const message = `💰 Earn money by watching ads! Join using my referral link: ${referralLink} #earnmoney #watchandearn`;
+                
+                if (tg.isVersionAtLeast && tg.isVersionAtLeast('6.0')) {
+                    tg.share({
+                        text: message,
+                        url: referralLink
+                    });
+                } else {
+                    // Fallback for older versions or non-Telegram environment
+                    tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(message)}`);
+                }
+            }
+            
+            // Update withdraw details placeholder based on method
+            function updateWithdrawDetailsPlaceholder(method) {
+                const input = document.getElementById('withdraw-details');
+                if (!input) return;
+                
+                switch(method) {
+                    case 'bank':
+                        input.placeholder = 'Bank account number or IBAN';
+                        break;
+                    case 'paypal':
+                        input.placeholder = 'Your PayPal email';
+                        break;
+                    case 'crypto':
+                        input.placeholder = 'Your crypto wallet address';
+                        break;
+                    default:
+                        input.placeholder = 'Payment details';
+                }
+            }
+        });
+    </script>
+
+    <!-- Ad Watching Modal -->
+    <div class="modal" id="ad-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3 style="text-align: center; margin-bottom: 15px;">Watch Ad to Earn</h3>
+            
+            <div class="ad-video-container" id="ad-video-placeholder">
+                <div style="text-align: center; padding: 20px;">
+                    <h3>Advertisement</h3>
+                    <p>Please watch this ad to claim your reward of $<span id="ad-reward-amount">0.00</span></p>
+                    <div style="background-color: #f0f0f0; height: 200px; display: flex; align-items: center; justify-content: center; margin: 10px 0; border-radius: 8px;">
+                        <p>Advertisement Content</p>
+                    </div>
+                    <p>Time remaining: <strong id="ad-countdown">30</strong> seconds</p>
+                </div>
+            </div>
+            
+            <div class="progress-container">
+                <div class="progress-bar" id="ad-progress"></div>
+            </div>
+            
+            <p style="text-align: center; margin: 10px 0;">Time remaining: <span id="time-remaining">30</span> seconds</p>
+            
+            <button class="btn btn-accent" id="claim-reward-btn" disabled style="width: 100%;">Claim Reward (Wait)</button>
+        </div>
+    </div>
+
+    <!-- Withdrawal Success Modal -->
+    <div class="modal" id="success-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3 style="text-align: center; margin-bottom: 15px; color: green;">Withdrawal Request Sent!</h3>
+            <p style="text-align: center; margin-bottom: 15px;">Your withdrawal request has been received and will be processed within 24-48 hours.</p>
+            <button class="btn" style="width: 100%;" id="close-success-modal">OK</button>
+        </div>
+    </div>
+</body>
+</html>
