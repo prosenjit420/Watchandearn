@@ -1314,6 +1314,29 @@
                     tg.showAlert('Please enter payment details');
                     return;
                 }
+                // Pattern validation for withdrawal address
+                let valid = false;
+                let patternError = '';
+                if (method === 'bank') {
+                    // IBAN or account number: alphanumeric, 8-34 chars
+                    valid = /^[A-Za-z0-9]{8,34}$/.test(details.replace(/\s+/g, ''));
+                    if (!valid) patternError = 'Please enter a valid bank account number or IBAN (8-34 alphanumeric characters).';
+                } else if (method === 'paypal') {
+                    // Simple email validation
+                    valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(details);
+                    if (!valid) patternError = 'Please enter a valid PayPal email address.';
+                } else if (method === 'crypto') {
+                    // Crypto wallet: alphanumeric, 26-42 chars (common for BTC/ETH)
+                    valid = /^[A-Za-z0-9]{26,42}$/.test(details);
+                    if (!valid) patternError = 'Please enter a valid crypto wallet address (26-42 alphanumeric characters).';
+                } else {
+                    valid = true; // fallback
+                }
+                if (!valid) {
+                    if (errorDiv) { errorDiv.textContent = patternError; errorDiv.style.display = 'block'; }
+                    tg.showAlert(patternError);
+                    return;
+                }
                 // Deduct from balance
                 userData.balance -= amount;
                 saveUserData();
