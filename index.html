@@ -1158,8 +1158,8 @@
                     return;
                 }
                 
-                // Random reward for this ad (between $0.05 and $0.25)
-                currentAdReward = (Math.floor(Math.random() * 21) + 5) / 100; // 0.05 to 0.25
+                // Random reward for this ad (between $0.01 and $0.05)
+                currentAdReward = (Math.floor(Math.random() * 5) + 1) / 100; // 0.01 to 0.05
                 const adRewardElement = document.getElementById('ad-reward-amount');
                 if (adRewardElement) adRewardElement.textContent = '$' + currentAdReward.toFixed(2);
                 
