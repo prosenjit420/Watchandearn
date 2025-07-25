@@ -882,7 +882,19 @@
             document.getElementById('popup-btn').addEventListener('click', showPopupAd);
             
             // Generate a unique user ID if not exists
-            const userId = 'user_' + Math.random().toString(36).substr(2, 9);
+            // const userId = 'user_' + Math.random().toString(36).substr(2, 9); // REMOVE THIS LINE
+            
+            // Get Telegram user ID if available, else fallback to random
+            let tgUserId = null;
+            if (window.Telegram && Telegram.WebApp && Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user) {
+                tgUserId = Telegram.WebApp.initDataUnsafe.user.id;
+            }
+            // Fallback for testing outside Telegram
+            if (!tgUserId) {
+                tgUserId = localStorage.getItem('adWatchUserId') || ('user_' + Math.random().toString(36).substr(2, 9));
+                localStorage.setItem('adWatchUserId', tgUserId);
+            }
+            const userStorageKey = `adWatchUserData_${tgUserId}`;
             
             // Initialize user data with default values if not exists
             let userData = {
@@ -904,7 +916,7 @@
             };
             
             // Load existing user data or initialize with defaults
-            const savedData = localStorage.getItem('adWatchUserData');
+            const savedData = localStorage.getItem(userStorageKey);
             if (savedData) {
                 const parsedData = JSON.parse(savedData);
                 // Check if it's a new day to reset today's earnings
@@ -1086,7 +1098,7 @@
             // Load user data from localStorage
             function loadUserData() {
                 try {
-                    const savedData = localStorage.getItem('adWatchUserData');
+                    const savedData = localStorage.getItem(userStorageKey);
                     if (savedData) {
                         userData = JSON.parse(savedData);
                     }
@@ -1099,7 +1111,7 @@
             // Save user data to localStorage
             function saveUserData() {
                 try {
-                    localStorage.setItem('adWatchUserData', JSON.stringify(userData));
+                    localStorage.setItem(userStorageKey, JSON.stringify(userData));
                 } catch (e) {
                     console.error('Error saving user data:', e);
                 }
