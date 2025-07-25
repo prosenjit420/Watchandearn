@@ -1158,8 +1158,10 @@
                     return;
                 }
                 
-                // Random reward for this ad (between $0.01 and $0.05)
-                currentAdReward = (Math.floor(Math.random() * 5) + 1) / 100; // 0.01 to 0.05
+                // Random reward for this ad (between $0.01 and $0.05, inclusive, all values possible)
+                const minCents = 1, maxCents = 5;
+                const randomCents = Math.floor(Math.random() * (maxCents - minCents + 1)) + minCents;
+                currentAdReward = randomCents / 100;
                 const adRewardElement = document.getElementById('ad-reward-amount');
                 if (adRewardElement) adRewardElement.textContent = '$' + currentAdReward.toFixed(2);
                 
@@ -1169,7 +1171,7 @@
                 
                 // Reset timer (30 seconds)
                 currentAdTime = 30;
-                const timeRemainingElement = document.getElementById('time-remaining');
+                const timeRemainingElement = document.getElementById('ad-countdown');
                 const adProgressElement = document.getElementById('ad-progress');
                 const claimRewardBtn = document.getElementById('claim-reward-btn');
                 const adModal = document.getElementById('ad-modal');
